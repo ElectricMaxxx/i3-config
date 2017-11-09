@@ -1,7 +1,7 @@
 #!/bin/bash
 
 EXTERNAL_OUTPUT_ONE="HDMI-1"
-EXTERNAL_OUTPUT_TWO="DP-1"
+EXTERNAL_OUTPUT_TWO="DP-2"
 INTERNAL_OUTPUT="eDP-1"
 
 function isConnected {
@@ -16,6 +16,21 @@ if [ ! -f "/tmp/monitor_mode.dat" ] ; then
 else
   monitor_mode=`cat /tmp/monitor_mode.dat`
 fi
+
+echo "" > ./config
+
+if isConnected ${EXTERNAL_OUTPUT_ONE}; then
+    cat ./config_base ./env/config_one > ./config
+    notify-send --icon=gtk-info "Use config for output one"
+elif isConnected ${EXTERNAL_OUTPUT_TWO}; then
+    cat ./config_base ./env/config_two > ./config
+    notify-send --icon=gtk-info "Use config for output two"
+else
+    cat ./config_base ./env/config_internal > ./config
+    notify-send --icon=gtk-info "Use config for internal output only"
+fi
+
+/usr/bin/i3 reload
 
 if isConnected ${EXTERNAL_OUTPUT_ONE} && isConnected ${EXTERNAL_OUTPUT_TWO} ; then
     if [ ${monitor_mode} = "INTERNAL" ]; then
